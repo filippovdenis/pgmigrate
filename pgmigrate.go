@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/BurntSushi/toml"
 	"github.com/go-pg/migrations/v7"
 	"github.com/go-pg/pg/v9"
 )
@@ -21,14 +22,30 @@ Usage:
   go run *.go <command> [args]
 `
 
+type Config struct {
+	Address string
+	User string
+	Database string
+	Password string
+}
+
 func main() {
 	flag.Usage = usage
 	flag.Parse()
 
+	var conf Config
+
+	_, errC := toml.DecodeFile("config.toml", &conf)
+	if errC != nil {
+		exitf(errC.Error())
+	}
+
+
 	db := pg.Connect(&pg.Options{
-		User:     "postgres",
-		Database: "postgres",
-		Password: "tamplier",
+		Addr:  conf.Address,
+		User:     conf.User,
+		Database: conf.Database,
+		Password: conf.Password,
 	})
 
 	oldVersion, newVersion, err := migrations.Run(db, flag.Args()...)
