@@ -1,2 +1,5 @@
 .idea
 *.exe
+config.toml
+go.mod
+go.sum
